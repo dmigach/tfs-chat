@@ -54,10 +54,10 @@ class MultipeerCommunicator: NSObject {
     init(_ messageConverter: IMessageConverter) {
         self.messageConverter = messageConverter
         self.serviceBrowser = MCNearbyServiceBrowser(peer: ConnectivityConstants.myPeerID,
-                                                serviceType: ConnectivityConstants.serviceType)
+                                                     serviceType: ConnectivityConstants.serviceType)
         self.serviceAdvertiser = MCNearbyServiceAdvertiser(peer: ConnectivityConstants.myPeerID,
-                                                      discoveryInfo: ConnectivityConstants.discoveryInfo,
-                                                      serviceType: ConnectivityConstants.serviceType)
+                                                           discoveryInfo: ConnectivityConstants.discoveryInfo,
+                                                           serviceType: ConnectivityConstants.serviceType)
         super.init()
         
         self.serviceBrowser.delegate = self
@@ -185,7 +185,7 @@ extension MultipeerCommunicator: MCSessionDelegate {
         case .connected:
             if let peerDiscoveryInfo = peersInfo[peerID] {
                 delegate?.foundUser(userID: peerID.displayName,
-                                      userName: peerDiscoveryInfo?[ConnectivityConstants.discoveryInfoUserNameKey])
+                                    userName: peerDiscoveryInfo?[ConnectivityConstants.discoveryInfoUserNameKey])
             }
         case .notConnected:
             if sessionList.removeValue(forKey: peerID) != nil {

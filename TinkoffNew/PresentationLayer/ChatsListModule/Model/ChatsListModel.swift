@@ -27,9 +27,9 @@ class ChatsListModel: IChatListModel {
     private static let defaultUserName = "Stranger"
     private let communicationService: ICommunicationService
     
-    private var conversations: [ChatDisplayModel] = [] {
+    private var chats: [ChatDisplayModel] = [] {
         didSet {
-            delegate?.setup(dataSource: conversations)
+            delegate?.setup(dataSource: chats)
         }
     }
     
@@ -42,20 +42,17 @@ class ChatsListModel: IChatListModel {
     }
 }
 
+//MARK: - ICommunicationServiceDelegate
 extension ChatsListModel: ICommunicationServiceDelegate {
-    
-    private func getChatWithUser(with userID: String) -> ChatDisplayModel? {
-        return conversations.filter {$0.messageID == userID}.first
-    }
     
     func foundUser(userID: String, userName: String?) {
         if let exsistedChat = getChatWithUser(with: userID) {
             exsistedChat.isOnline = true
-            delegate?.setup(dataSource: conversations)
+            delegate?.setup(dataSource: chats)
         } else {
             let newChat = ChatDisplayModel(messageID: userID,
                                            userName: userName ?? ChatsListModel.defaultUserName)
-            conversations.append(newChat)
+            chats.append(newChat)
         }
     }
     
@@ -64,7 +61,7 @@ extension ChatsListModel: ICommunicationServiceDelegate {
             return
         }
         exsistedChat.isOnline = false
-        delegate?.setup(dataSource: conversations)
+        delegate?.setup(dataSource: chats)
     }
     
     func receivedMessage(text: String, fromUserID: String, toUserID: String) {
@@ -75,6 +72,10 @@ extension ChatsListModel: ICommunicationServiceDelegate {
         let receivedMessage = MessageDisplayModel(withText: text, date: Date().getDateForMessage(), type: .incoming)
         exsistedChat.appendMessage(receivedMessage)
         exsistedChat.setState(.unread)
-        delegate?.setup(dataSource: conversations)
+        delegate?.setup(dataSource: chats)
+    }
+    
+    private func getChatWithUser(with userID: String) -> ChatDisplayModel? {
+        return chats.filter {$0.messageID == userID}.first
     }
 }

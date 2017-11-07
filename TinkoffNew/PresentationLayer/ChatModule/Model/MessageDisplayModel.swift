@@ -14,11 +14,13 @@ class MessageDisplayModel {
         case outgoing
     }
     
-    let type: MessageType
     let text: String
     let date: String
+    let type: MessageType
     
-    init(withText text: String, date: String, type: MessageType) {
+    init(withText text: String,
+         date: String,
+         type: MessageType) {
         self.text = text
         self.date = date
         self.type = type

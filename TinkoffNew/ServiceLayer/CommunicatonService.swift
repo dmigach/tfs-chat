@@ -37,30 +37,35 @@ class CommunicationService: ICommunicationService {
         self.communicator = communicator
     }
     
-    func sendMessage(text: String, to userID: String, completionHandler: ((_ success: Bool, _ error: Error?) -> Void)?) {
-        communicator.sendMessage(text: text, to: userID, completionHandler: completionHandler)
+    func sendMessage(text: String,
+                     to userID: String,
+                     completionHandler: ((_ success: Bool, _ error: Error?) -> Void)?) {
+        communicator.sendMessage(text: text,
+                                 to: userID,
+                                 completionHandler: completionHandler)
     }
 }
 
 // MARK: - ICommunicationServiceDelegate
 extension CommunicationService: ICommunicatorDelegate {
-    func foundUser(userID: String, userName: String?) {
-        delegate?.foundUser(userID: userID, userName: userName)
-    }
     
     func lostUser(userID: String) {
         delegate?.lostUser(userID: userID)
     }
-    
-    func receivedMessage(text: String, fromUser sender: String, toUser receiver: String) {
-        delegate?.receivedMessage(text: text, fromUserID: sender, toUserID: receiver)
-    }
-    
+
     func failedToStartAdvertising(error: Error) {
         assertionFailure("\(error)")
     }
     
     func failedToStartBrowsingForUsers(error: Error) {
         assertionFailure("\(error)")
+    }
+    
+    func foundUser(userID: String, userName: String?) {
+        delegate?.foundUser(userID: userID, userName: userName)
+    }
+    
+    func receivedMessage(text: String, fromUser sender: String, toUser receiver: String) {
+        delegate?.receivedMessage(text: text, fromUserID: sender, toUserID: receiver)
     }
 }

@@ -74,6 +74,7 @@
                                             <outlet property="dateLabel" destination="u0d-dL-QGZ" id="1Nv-xg-Vz3"/>
                                             <outlet property="messageLabel" destination="yaR-As-hmx" id="ght-OI-7FT"/>
                                             <outlet property="nameLabel" destination="vWE-Gk-Knn" id="rVg-c9-t7T"/>
+                                            <segue destination="d7N-em-cCc" kind="show" identifier="ShowChat" id="MlX-Au-ptR"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -93,6 +94,7 @@
                         <barButtonItem key="rightBarButtonItem" image="ProfileIcon" id="84x-Ya-H3H">
                             <connections>
                                 <action selector="openProfile:" destination="qh3-NU-IwY" id="J6f-F9-MwN"/>
+                                <segue destination="iu1-Mt-6uS" kind="show" identifier="ShowProfile" id="B9k-44-6gk"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -103,6 +105,22 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fEG-4t-bE8" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-448.80000000000001" y="61.619190404797607"/>
+        </scene>
+        <!--Chat-->
+        <scene sceneID="cdX-gX-Vg3">
+            <objects>
+                <viewControllerPlaceholder storyboardName="Chat" id="d7N-em-cCc" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="7t4-N5-dQv" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-449" y="596"/>
+        </scene>
+        <!--Profile-->
+        <scene sceneID="7lc-bB-B4s">
+            <objects>
+                <viewControllerPlaceholder storyboardName="Profile" id="iu1-Mt-6uS" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ddW-A8-YNa" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="460" y="61"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="15m-Fm-lo4">

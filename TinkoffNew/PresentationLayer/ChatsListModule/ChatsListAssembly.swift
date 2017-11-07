@@ -8,36 +8,22 @@
 
 import UIKit
 
-class ConversationsListAssembly {
+class ChatsListAssembly {
     private let communicationService: ICommunicationService
     
-    init(_ communicationService: ICommunicationService) {
+    init(communicationService: ICommunicationService) {
         self.communicationService = communicationService
     }
     
-    func assembly(_ conversationsListViewController: ChatsListViewController) {
-        let model = getConversationsListModel()
-        model.delegate = conversationsListViewController
-        conversationsListViewController.setDependencies(model)
+    func injectDependencies(to chatsListVC: ChatsListViewController) {
+        let model = createChatsListModel()
+        model.delegate = chatsListVC
+        chatsListVC.inject(model: model)
     }
     
-    // MARK: - Private methods
-    
-    private func getConversationsListModel() -> IChatListModel {
-        let conversationsListModel = ChatsListModel(communicationService: communicationService)
-        communicationService.delegate = conversationsListModel
-        return conversationsListModel
+    private func createChatsListModel() -> IChatListModel {
+        let chatsListModel = ChatsListModel(communicationService: communicationService)
+        communicationService.delegate = chatsListModel
+        return chatsListModel
     }
-    
-//    private func getMessageHandler() -> IMessageCenter {
-//        return MessageHandler(encoder: getMessageEncoder(), decoder: getMessageDecoder())
-//    }
-//    
-//    private func getMessageEncoder() -> IMessageEncoder {
-//        return MessageEncoder()
-//    }
-//    
-//    private func getMessageDecoder() -> IMessageDecoder {
-//        return MessageDecoder()
-//    }
 }
