@@ -53,6 +53,7 @@ class ChatViewController: UIViewController {
         registerForKeyboardNotifications()
         setupMessageTextView()
         messageTextView.delegate = self
+        sendButton.isEnabled = false
     }
     
     override func viewDidAppear(_ animated: Bool) {

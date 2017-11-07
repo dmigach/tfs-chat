@@ -15,8 +15,8 @@ protocol IChatListModelDelegate: class {
 }
 
 protocol IChatListModel: class {
+    func relaunchCommunication()
     weak var delegate: IChatListModelDelegate? { get set }
-    func resumeListeningToCommunicationService()
 }
 
 //MARK: - ChatsListModel
@@ -37,7 +37,7 @@ class ChatsListModel: IChatListModel {
         self.communicationService = communicationService
     }
     
-    func resumeListeningToCommunicationService() {
+    func relaunchCommunication() {
         communicationService.delegate = self
     }
 }
@@ -66,7 +66,7 @@ extension ChatsListModel: ICommunicationServiceDelegate {
     
     func receivedMessage(text: String, fromUserID: String, toUserID: String) {
         guard let exsistedChat = getChatWithUser(with: fromUserID) else {
-            assertionFailure("received message from unknown user")
+//            assertionFailure("received message from unknown user")
             return
         }
         let receivedMessage = MessageDisplayModel(withText: text, date: Date().getDateForMessage(), type: .incoming)

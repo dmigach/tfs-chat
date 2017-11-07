@@ -53,6 +53,7 @@ class ProfileViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        
         loadUserProfile()
         setupPhotoImageView()
         setupAddPhotoButton()
