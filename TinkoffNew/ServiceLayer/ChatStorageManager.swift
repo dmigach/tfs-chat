@@ -8,7 +8,23 @@
 
 import Foundation
 
-class ChatStorageManager {
+protocol IChatStorageManager {
+    func getUserName(withId userID: String) -> String
+    func saveOutgoingMessage(messageText: String,
+                             toUser: String,
+                             completionHandler: @escaping () -> () )
+    func saveMessage(messageText: String,
+                     fromUser: String,
+                     toUser: String,
+                     type: MessageDisplayModel.MessageType,
+                     completionHandler: @escaping () -> () )
+    func markChatAsRead(chatID: String)
+    func set(onlineStatus status: Bool, forUserWithID userID: String)
+    var stack: ICoreDataStack { get set }
+    func getChatOnlineStatus(withID ID: String) -> Bool
+}
+
+class ChatStorageManager: IChatStorageManager {
     var stack: ICoreDataStack
     
     init(coreDataStack: ICoreDataStack) {
@@ -26,6 +42,19 @@ class ChatStorageManager {
             return "Stranger"
         }
         return user.name ?? "Stranger"
+    }
+    
+    func getChatOnlineStatus(withID ID: String) -> Bool {
+        guard let context = stack.saveContext else {
+            assertionFailure("Save context in core data stack is nil")
+            return false
+        }
+        
+        guard let chat = Chat.findOrInsertChat(withID: ID, into: context) else {
+            return false
+        }
+        
+        return chat.isOnline
     }
     
     private func getMyID() -> String {

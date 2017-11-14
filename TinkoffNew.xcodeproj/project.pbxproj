@@ -200,12 +200,13 @@
 		648B470A1FAE16C40095AA9B /* Storage */ = {
 			isa = PBXGroup;
 			children = (
-				64FBC6481FAA4DCF00D4A259 /* TinkoffMes.xcdatamodeld */,
+				64FF43251FB99412004E956E /* DataProviders */,
 				642FA4BB1FB1F91E00947C27 /* Model */,
 				642FA4BA1FB1F91600947C27 /* GCD */,
 				642FA4B91FB1F8FA00947C27 /* CoreData */,
 				64B5434E1FB0241300B1D0D3 /* Operation */,
 				648B470F1FAE17410095AA9B /* FileProfileStorage.swift */,
+				64FBC6481FAA4DCF00D4A259 /* TinkoffMes.xcdatamodeld */,
 			);
 			path = Storage;
 			sourceTree = "<group>";
@@ -213,7 +214,6 @@
 		64AB90E61FAB18F90094265B /* ServiceLayer */ = {
 			isa = PBXGroup;
 			children = (
-				64FF43251FB99412004E956E /* DataProviders */,
 				6454EE1D1FB1A7ED00A3CF6B /* ProfileStorageManager.swift */,
 				64AC5BDB1FAC43C300030ADF /* CommunicatonService.swift */,
 				648B47081FAE16970095AA9B /* ProfileStorageService.swift */,
@@ -265,10 +265,10 @@
 			isa = PBXGroup;
 			children = (
 				64AC5BE91FAC4A7A00030ADF /* Date+Extension.swift */,
-				64AC5BEE1FACBB3B00030ADF /* Array+Extension.swift */,
-				6454EE1F1FB1A99100A3CF6B /* AppUser+Extension.swift */,
 				6454EE211FB1A99800A3CF6B /* User+Extension.swift */,
 				64FF432C1FB99CF5004E956E /* Chat+Extension.swift */,
+				64AC5BEE1FACBB3B00030ADF /* Array+Extension.swift */,
+				6454EE1F1FB1A99100A3CF6B /* AppUser+Extension.swift */,
 				64FF43321FBAD6DC004E956E /* Message+Extension.swift */,
 			);
 			path = Extensions;

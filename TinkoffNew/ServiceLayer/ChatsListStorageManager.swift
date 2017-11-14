@@ -8,7 +8,17 @@
 
 import Foundation
 
-class ChatsListStorageManager {
+protocol IChatsListStorageManager {
+    var stack: ICoreDataStack { get set }
+    func saveChat(withUser userID: String, userName: String?)
+    func changeChatStatusToOffline(withUser userID: String)
+    func saveMessage(messageText: String,
+                     fromUser: String,
+                     toUser: String,
+                     completionHandler: @escaping () -> () )
+}
+
+class ChatsListStorageManager: IChatsListStorageManager {
     var stack: ICoreDataStack
     
     init(coreDataStack: ICoreDataStack) {

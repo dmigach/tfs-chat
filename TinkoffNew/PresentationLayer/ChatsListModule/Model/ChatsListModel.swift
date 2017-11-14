@@ -52,7 +52,7 @@ class ChatsListModel: IChatListModel {
                                                       stack: self.chatsListStorageManager.stack)
         }
     }
-    let chatsListStorageManager: ChatsListStorageManager
+    let chatsListStorageManager: IChatsListStorageManager
     
     private static let defaultUserName = "Stranger"
     private let communicationService: ICommunicationService

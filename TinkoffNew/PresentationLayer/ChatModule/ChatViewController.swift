@@ -54,6 +54,7 @@ class ChatViewController: UIViewController {
         messageTextView.delegate = self
         registerForKeyboardNotifications()
         configureTitle(with: model.userName)
+        self.userIsOnline = model.chatOnline
     }
     
     override func viewDidAppear(_ animated: Bool) {

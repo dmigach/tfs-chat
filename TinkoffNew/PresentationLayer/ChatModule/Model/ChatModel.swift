@@ -17,6 +17,7 @@ protocol IChatModel: class {
     weak var delegate: IChatModelDelegate? { get set }
     func send(message: String, completionHandler: (() -> Void)?)
     func getMessage(at indexPath: IndexPath) -> MessageDisplayModel
+    var chatOnline: Bool { get set }
 }
 
 protocol IChatModelDelegate: class {
@@ -38,10 +39,12 @@ class ChatModel: IChatModel {
     }
     var userName: String
     var hasNoMessages: Bool = false
+    var chatOnline: Bool
 
     private let chatID: String
-    private let chatStorageManager: ChatStorageManager
+    private let chatStorageManager: IChatStorageManager
     private let communicationService: ICommunicationService
+
     
     //MARK: - Init
     init(communicationService: ICommunicationService,
@@ -51,6 +54,7 @@ class ChatModel: IChatModel {
         self.chatStorageManager = chatStoragemanager
         self.communicationService = communicationService
         self.userName = self.chatStorageManager.getUserName(withId: chatID)
+        self.chatOnline = self.chatStorageManager.getChatOnlineStatus(withID: self.chatID)
     }
     
     func markChatAsRead() {
@@ -101,6 +105,7 @@ class ChatModel: IChatModel {
 // MARK: - ICommunicationServiceDelegate
 extension ChatModel: ICommunicationServiceDelegate {
     func lostUser(userID: String) {
+        self.chatOnline = false
         self.chatStorageManager.set(onlineStatus: false,
                                     forUserWithID: userID)
         if self.chatID == userID {
@@ -109,6 +114,7 @@ extension ChatModel: ICommunicationServiceDelegate {
     }
     
     func didFindUser(userID: String, userName: String?) {
+        self.chatOnline = true
         self.chatStorageManager.set(onlineStatus: true,
                                     forUserWithID: userID)
         if self.chatID == userID {
