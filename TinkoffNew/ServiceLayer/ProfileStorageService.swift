@@ -22,26 +22,30 @@ class ProfileStorageService: IProfileStorageService {
     
     //MARK: - Properties
     private let GCDStorage: IProfileStorage
-    private let coreDataStorage: StorageManager
     private let OperationStorage: IProfileStorage
+    private let coreDataStorage: ProfileStorageManager
 
     //MARK: - Init
     init(profileGCDStorage: IProfileStorage,
          OperationStorage: IProfileStorage,
-         CoreDataStorage: StorageManager) {
+         CoreDataStorage: ProfileStorageManager) {
         self.GCDStorage = profileGCDStorage
         self.coreDataStorage = CoreDataStorage
         self.OperationStorage = OperationStorage
     }
     
     //MARK: - Save/load
-    func save(profile: ProfileStorageModel, saveKind: ProfileSaveKind, completionHandler: @escaping (Bool) -> ()) {
+    func save(profile: ProfileStorageModel,
+              saveKind: ProfileSaveKind,
+              completionHandler: @escaping (Bool) -> ()) {
         let manager = dataManager(with: saveKind)
-        manager.save(profile: profile, completionHandler: completionHandler)
+        manager.save(profile: profile,
+                     completionHandler: completionHandler)
         
     }
     
-    func load(saveKind: ProfileSaveKind, completionHandler: @escaping (ProfileStorageModel?) -> ()) {
+    func load(saveKind: ProfileSaveKind,
+              completionHandler: @escaping (ProfileStorageModel?) -> ()) {
         let manager = dataManager(with: saveKind)
         manager.load(completionHandler: completionHandler)
     }

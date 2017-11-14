@@ -1,0 +1,10 @@
+# User settings
+xcuserdata/
+
+*.xcscmblueprint
+*.xccheckout
+
+build/
+DerivedData/
+
+.DS_Store

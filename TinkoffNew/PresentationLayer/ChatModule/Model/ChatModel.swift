@@ -12,15 +12,15 @@ import UIKit
 protocol IChatModel: class {
     func markChatAsRead()
     var userName: String { get }
+    func getNumberOfRows() -> Int
     var hasNoMessages: Bool { get }
-    func send(message: String,
-              completionHandler: (() -> Void)?)
     weak var delegate: IChatModelDelegate? { get set }
-
+    func send(message: String, completionHandler: (() -> Void)?)
+    func getMessage(at indexPath: IndexPath) -> MessageDisplayModel
 }
 
 protocol IChatModelDelegate: class {
-    func setup(dataSource: [MessageDisplayModel])
+    var tableView: UITableView! {get set}
     func userChangedStatusTo(online: Bool)
 }
 
@@ -28,66 +28,99 @@ protocol IChatModelDelegate: class {
 class ChatModel: IChatModel {
     
     //MARK: - Properties
-    weak var delegate: IChatModelDelegate?
-    
-    var userName: String {
-        return chat.userName
+    private var dataProvider: ChatDataProvider?
+    weak var delegate: IChatModelDelegate? {
+        didSet {
+            self.dataProvider = ChatDataProvider(tableView: delegate?.tableView,
+                                                 stack: self.chatStorageManager.stack,
+                                                 chatID: self.chatID)
+        }
     }
-    
-    var hasNoMessages: Bool {
-        return chat.messages.isEmpty
-    }
-    
-    private let chat: ChatDisplayModel
+    var userName: String
+    var hasNoMessages: Bool = false
+
+    private let chatID: String
+    private let chatStorageManager: ChatStorageManager
     private let communicationService: ICommunicationService
     
     //MARK: - Init
     init(communicationService: ICommunicationService,
-         chat: ChatDisplayModel) {
-        self.chat = chat
+         chatStoragemanager: ChatStorageManager,
+         chatID: String) {
+        self.chatID = chatID
+        self.chatStorageManager = chatStoragemanager
         self.communicationService = communicationService
+        self.userName = self.chatStorageManager.getUserName(withId: chatID)
     }
     
     func markChatAsRead() {
-        chat.setState(.read)
+        chatStorageManager.markChatAsRead(chatID: chatID)
     }
     
     func send(message: String,
               completionHandler: (() -> Void)?) {
+        chatStorageManager.saveOutgoingMessage(messageText: message,
+                                               toUser: self.chatID,
+                                               completionHandler: {})
         communicationService.sendMessage(text: message,
-                                         to: chat.messageID) { [unowned self] (success: Bool, error: Error?) in
-            if error == nil {
-                if success {
-                    let sentMessage = MessageDisplayModel(withText: message, date: Date().getDateForMessage(), type: .outgoing)
-                    self.chat.appendMessage(sentMessage)
-                } else {
-                    assertionFailure("Error seding message")
-                }
+                                         to: self.chatID,
+                                         completionHandler: { (success: Bool, error: Error?) in
+            if let error = error {
+                print("Error sending message: \(error)")
+            } else if success {
+                completionHandler?()
+                print("send success")
+            } else {
+                print("Error sending message: unknown error")
             }
-            completionHandler?()
-            self.delegate?.setup(dataSource: self.chat.messages)
+        })
+    }
+    
+    func getNumberOfRows() -> Int {
+        guard let frc = dataProvider?.fetchedResultsController,
+            let section = frc.sections?.first! else {
+                return 0
         }
+        return section.numberOfObjects
+    }
+    
+    func getMessage(at indexPath: IndexPath) -> MessageDisplayModel {
+        if let frc = dataProvider?.fetchedResultsController {
+            let message = frc.object(at: indexPath)
+            let messageDisplayModel = MessageDisplayModel(withText: message.text!,
+                                                          date: (message.date?.getDateForMessage())!,
+                                                          type: MessageDisplayModel.MessageType(rawValue: Int(message.messageType))!)
+            return messageDisplayModel
+        }
+        return MessageDisplayModel(withText: "Not found",
+                                   date: Date().getDateForMessage(),
+                                   type: .incoming)
     }
 }
 
 // MARK: - ICommunicationServiceDelegate
 extension ChatModel: ICommunicationServiceDelegate {
     func lostUser(userID: String) {
-        if chat.messageID == userID {
+        self.chatStorageManager.set(onlineStatus: false,
+                                    forUserWithID: userID)
+        if self.chatID == userID {
             delegate?.userChangedStatusTo(online: false)
         }
     }
     
     func didFindUser(userID: String, userName: String?) {
-        if chat.messageID == userID {
+        self.chatStorageManager.set(onlineStatus: true,
+                                    forUserWithID: userID)
+        if self.chatID == userID {
             delegate?.userChangedStatusTo(online: true)
         }
     }
     
     func receivedMessage(text: String, fromUserID fromUser: String, toUserID toUser: String) {
-        if chat.messageID == fromUser {
-            chat.appendMessage(MessageDisplayModel(withText: text, date: Date().getDateForMessage(), type: .incoming))
-            delegate?.setup(dataSource: chat.messages)
-        }
+        self.chatStorageManager.saveMessage(messageText: text,
+                                            fromUser: fromUser,
+                                            toUser: toUser,
+                                            type: .incoming,
+                                            completionHandler: {})
     }
 }

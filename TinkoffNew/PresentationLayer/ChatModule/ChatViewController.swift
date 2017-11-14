@@ -11,7 +11,7 @@ import UIKit
 class ChatViewController: UIViewController {
 
     //MARK: - Outlets
-    @IBOutlet private weak var tableView: UITableView!
+    @IBOutlet internal weak var tableView: UITableView!
     @IBOutlet private weak var sendButton: UIButton! {
         didSet {
             sendButton.isEnabled = true
@@ -43,17 +43,17 @@ class ChatViewController: UIViewController {
             changeSendButtonState(flag: userIsOnline)
         }
     }
-    private var messages = [MessageDisplayModel]()
 
     // MARK: View life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureTitle(with: model.userName)
         configureTableView()
-        registerForKeyboardNotifications()
         setupMessageTextView()
-        messageTextView.delegate = self
+        self.model.delegate = self
         sendButton.isEnabled = false
+        messageTextView.delegate = self
+        registerForKeyboardNotifications()
+        configureTitle(with: model.userName)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -82,16 +82,16 @@ class ChatViewController: UIViewController {
     
     // MARK: UI
     private func setupMessageTextView() {
+        self.messageTextView.layer.borderWidth = 1
         self.messageTextView.layer.cornerRadius = 10
         self.messageTextView.layer.borderColor = UIColor.black.cgColor
-        self.messageTextView.layer.borderWidth = 1
     }
     
     private func changeSendButtonState(flag: Bool) {
         DispatchQueue.main.async {
             let conditionToEnableButton = self.userIsOnline && self.messageTextView != nil && self.messageTextView.text != ""
-            let currentButtonStateIsDifferent = self.sendButton.isEnabled != conditionToEnableButton
-            if currentButtonStateIsDifferent {
+            let currentButtonStateDiffers = self.sendButton.isEnabled != conditionToEnableButton
+            if currentButtonStateDiffers {
                 self.sendButton.isEnabled = flag
             }
         }
@@ -106,7 +106,8 @@ class ChatViewController: UIViewController {
     }
     
     private func registerForKeyboardNotifications() {
-        NotificationCenter.default.addObserver(self, selector: #selector(moveScreen(_:)), name: .UIKeyboardWillChangeFrame, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(moveScreen(_:)),
+                                               name: .UIKeyboardWillChangeFrame, object: nil)
     }
     
     private func scrollToBottom() {
@@ -147,14 +148,6 @@ extension ChatViewController: IChatModelDelegate {
     func userChangedStatusTo(online: Bool) {
         self.userIsOnline = false
     }
-    
-    func setup(dataSource: [MessageDisplayModel]) {
-        self.messages = dataSource
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
-            self.scrollToBottom()
-        }
-    }
 }
 
 // MARK: - UITableViewDataSource
@@ -165,17 +158,21 @@ extension ChatViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return messages.count
+        return model.getNumberOfRows()
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let message = messages[indexPath.row]
+        let message = model.getMessage(at: indexPath)
+        
         let identifier = message.type == .incoming ? CellIdentifier.incomingCellIdentifier : CellIdentifier.outgoingCellIdentifier
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath)
+        
         guard let messageCell = cell as? MessageCellConfiguration & UITableViewCell else {
             assertionFailure("Wrong cell type")
             return cell
         }
+        
         messageCell.textOfMessage = message.text
         return cell
     }
@@ -189,4 +186,3 @@ extension ChatViewController: UITextViewDelegate {
         }
     }
 }
-

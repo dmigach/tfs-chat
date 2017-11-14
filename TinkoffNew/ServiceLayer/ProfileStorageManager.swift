@@ -6,11 +6,11 @@
 //  Copyright © 2017 Dmitry Gachkovsky. All rights reserved.
 //
 
-import Foundation
-import CoreData
 import UIKit
+import CoreData
+import Foundation
 
-class StorageManager: IProfileStorage {
+class ProfileStorageManager: IProfileStorage {
     let stack: ICoreDataStack
     
     init(with stack: ICoreDataStack) {
@@ -23,7 +23,7 @@ class StorageManager: IProfileStorage {
             completionHandler(false)
             return
         }
-        guard let appUser = AppUser.findOrInsertAppUser(in: context) else {
+        guard let appUser = AppUser.findOrInsertAppUser(into: context) else {
             completionHandler(false)
             return
         }
@@ -49,7 +49,6 @@ class StorageManager: IProfileStorage {
         }
     }
     
-    
     func load(completionHandler: @escaping (ProfileStorageModel?) -> Void) {
         
         guard let context = stack.saveContext else {
@@ -59,7 +58,7 @@ class StorageManager: IProfileStorage {
         
         context.perform {
     
-            guard let appUser = AppUser.findOrInsertAppUser(in: context) else {
+            guard let appUser = AppUser.findOrInsertAppUser(into: context) else {
                 completionHandler(nil)
                 return
             }

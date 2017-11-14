@@ -6,15 +6,14 @@
 //  Copyright © 2017 Dmitry Gachkovsky. All rights reserved.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 extension AppUser {
     
-    static func findOrInsertAppUser(in context: NSManagedObjectContext) -> AppUser? {
-        
+    static func findOrInsertAppUser(into context: NSManagedObjectContext) -> AppUser? {
         guard let model = context.persistentStoreCoordinator?.managedObjectModel else {
-            assertionFailure("Model is not available in the context")
+            assertionFailure("Model not found in context")
             return nil
         }
         
@@ -30,19 +29,21 @@ extension AppUser {
                 appUser = foundUser
             }
         } catch {
-            print("Failed to fetch AppUser: \(error.localizedDescription)")
+            print("Error fetching AppUser: \(error)")
         }
         
         if appUser == nil {
-            appUser = AppUser.insertAppUser(in: context)
+            appUser = AppUser.insertAppUser(into: context)
         }
         return appUser
     }
     
-    static func insertAppUser(in context: NSManagedObjectContext) -> AppUser? {
-        if let appUser = NSEntityDescription.insertNewObject(forEntityName: "AppUser", into: context) as? AppUser {
+    static func insertAppUser(into context: NSManagedObjectContext) -> AppUser? {
+        if let appUser = NSEntityDescription.insertNewObject(forEntityName: "AppUser",
+                                                             into: context) as? AppUser {
             if appUser.currentUser == nil {
-                let currentUser = User.findOrInsertAppUser(with: User.generatedUserIdString, in: context)
+                let currentUser = User.findOrInsertUser(with: User.generateUserID,
+                                                        into: context)
                 currentUser?.name = "dmigach"
                 appUser.currentUser = currentUser
             }

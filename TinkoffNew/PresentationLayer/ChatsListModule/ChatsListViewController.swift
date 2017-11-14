@@ -8,15 +8,13 @@
 
 import UIKit
 
-class ChatsListViewController: UIViewController {
+class ChatsListViewController: UIViewController, IChatsListModelDelegate {
     
     //MARK: - Outlets
-    @IBOutlet private weak var tableView: UITableView!
+    @IBOutlet weak var tableView: UITableView!
 
     //MARK: - Properties
     private var model: IChatListModel!
-    private let sectionTitles = ["Online", "History"]
-    private var chats = [[ChatDisplayModel](), [ChatDisplayModel]()]
     
     private struct SegueIdentifiers {
         static let chat = "ShowChat"
@@ -30,7 +28,8 @@ class ChatsListViewController: UIViewController {
     //MARK: VC Life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.dataSource = self
+        self.model.delegate = self
+        self.tableView.dataSource = self
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -65,15 +64,12 @@ class ChatsListViewController: UIViewController {
             assertionFailure("Unknown segue destination view controller")
             return
         }
-        let choosedChat = self.getChat(at: selectedIndexPath)
-        RootAssembly.chatAssembly.assembly(chatViewController: chatViewController,
-                                                   chat: choosedChat)
+        let choosedChat = model.getChat(at: selectedIndexPath)
+        if let id = choosedChat.chatID {
+            RootAssembly.chatAssembly.assembly(chatViewController: chatViewController,
+                                               chatID: id)
+        }
         tableView.deselectRow(at: selectedIndexPath, animated: true)
-    }
-    
-    //MARK: - Helpers
-    func getChat(at indexPath: IndexPath) -> ChatDisplayModel {
-        return chats[indexPath.section][indexPath.row]
     }
 }
 
@@ -87,40 +83,28 @@ extension ChatsListViewController: UITableViewDataSource {
             return cell
         }
         
-        let chat = self.getChat(at: indexPath)
-        chatCell.name = chat.userName
-        chatCell.online = chat.isOnline
-        chatCell.configureCellAppearance()
-        chatCell.date = chat.lastMessageDate
-        chatCell.message = chat.messages.last?.text
-        chatCell.hasUnreadMessages = chat.hasUnreadMessages
-        
+        if let chat = model?.getChat(at: indexPath) {
+            chat.configureChatCell(cell: chatCell)
+            chatCell.configureCellAppearance()
+        }
         return chatCell
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return chats.count
+        if let number = model?.getNumberOfSections() {
+            return number
+        }
+        return 0
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return chats[section].count
+        if let number = model?.getNumberOfRowsIn(section: section) {
+            return number
+        }
+        return 0
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return sectionTitles[section]
+        return model.getTitleForSection(section: section)
     }
 }
-
-//MARK: - IChatListModelDelegate
-extension ChatsListViewController: IChatListModelDelegate {
-    func setup(dataSource: [ChatDisplayModel]) {
-        let onlineChats = dataSource.filter { $0.isOnline }.sort()
-        let offlineChats = dataSource.filter { !$0.isOnline }.sort()
-        chats = [onlineChats, offlineChats]
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
-        }
-    }
-}
-
-

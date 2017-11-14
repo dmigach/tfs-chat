@@ -10,37 +10,23 @@ import Foundation
 
 class ChatDisplayModel {
     
-    enum State {
-        case read
-        case unread
-    }
-    
+    let chatID: String
     var isOnline = true
     let userName: String
-    let messageID: String
 
-    private(set) var hasUnreadMessages = true
+    var hasUnreadMessages = true
     private(set) var messages = [MessageDisplayModel]()
     
     var lastMessageDate: String? {
         return messages.last?.date
     }
     
-    init(messageID: String, userName: String) {
-        self.messageID = messageID
+    init(chatID: String, userName: String) {
+        self.chatID = chatID
         self.userName = userName
     }
     
     func appendMessage(_ message: MessageDisplayModel) {
         messages.append(message)
-    }
-    
-    func setState(_ state: State) {
-        switch state {
-        case .read:
-            hasUnreadMessages = false
-        case .unread:
-            hasUnreadMessages = true
-        }
     }
 }

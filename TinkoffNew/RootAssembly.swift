@@ -7,10 +7,11 @@
 //
 
 class RootAssembly {
-    static let profileAssembly = ProfileAssembly()
+    static let profileAssembly = ProfileAssembly(coreDataStack: coreDataStack)
 
-    static let chatsListAssembly: ChatsListAssembly = {
-        let chatsListAssembler = ChatsListAssembly(communicationService: communicationServiceAssembly)
+    static let chatsListAssembly: ChatsListModuleAssembly = {
+        let chatsListAssembler = ChatsListModuleAssembly(communicationService: RootAssembly.communicationServiceAssembly,
+                                                         coreDataStack: coreDataStack)
         return chatsListAssembler
     }()
     
@@ -23,8 +24,12 @@ class RootAssembly {
     }()
     
     static let chatAssembly: ChatAssembly = {
-        let communicationAssembly = ChatAssembly(communicationService: communicationServiceAssembly)
+        let communicationAssembly = ChatAssembly(communicationService: RootAssembly.communicationServiceAssembly,
+                                                 coreDataStack: RootAssembly.coreDataStack)
         return communicationAssembly
     }()
-
+    
+    private static let coreDataStack: ICoreDataStack = {
+       return CoreDataStack()
+    }()
 }

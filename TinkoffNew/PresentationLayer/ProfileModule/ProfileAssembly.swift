@@ -15,10 +15,15 @@ protocol IProfileStorage {
 }
 
 class ProfileAssembly {
+    private var coreDataStack: ICoreDataStack
     
-    private func getCoreDataStorage() -> StorageManager {
+    init(coreDataStack: ICoreDataStack) {
+        self.coreDataStack = CoreDataStack()
+    }
+    
+    private func getCoreDataStorage() -> ProfileStorageManager {
         let dataStack = CoreDataStack()
-        return StorageManager.init(with: dataStack)
+        return ProfileStorageManager.init(with: dataStack)
     }
     
     private func getProfileConverter() -> IProfileConverter {
@@ -32,7 +37,7 @@ class ProfileAssembly {
     
     private func getStorages() -> (profileGCDStorage: IProfileStorage,
         profileOperationQueueStorage: IProfileStorage,
-        profileCoreDataStorage: StorageManager) {
+        profileCoreDataStorage: ProfileStorageManager) {
         let profileHandler = getProfileConverter()
         let coreDataStorage = self.getCoreDataStorage()
             return (ProfileGCDStorage(profileConverter: profileHandler),

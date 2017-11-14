@@ -10,25 +10,32 @@ import Foundation
 
 class ChatAssembly {
     
+    private let coreDataStack: ICoreDataStack
     private let communicationService: ICommunicationService
     
-    init(communicationService: ICommunicationService) {
+    init(communicationService: ICommunicationService,
+         coreDataStack: ICoreDataStack) {
+        self.coreDataStack = coreDataStack
         self.communicationService = communicationService
     }
     
     func assembly(chatViewController: ChatViewController,
-                  chat: ChatDisplayModel) {
+                  chatID: String) {
         let model = getChatModel(communicationService: communicationService,
-                                 chat: chat)
-        communicationService.delegate = model
-        chatViewController.setup(dataSource: chat.messages)
+                                 chatID: chatID)
         model.delegate = chatViewController
+        communicationService.delegate = model
         chatViewController.injectDependencies(model: model)
     }
     
     private func getChatModel(communicationService: ICommunicationService,
-                              chat: ChatDisplayModel) -> ChatModel {
+                              chatID: String) -> ChatModel {
         return ChatModel(communicationService: communicationService,
-                         chat: chat)
+                         chatStoragemanager: self.getChatStorageManager(),
+                         chatID: chatID)
+    }
+    
+    private func getChatStorageManager() -> ChatStorageManager {
+        return ChatStorageManager(coreDataStack: self.coreDataStack)
     }
 }

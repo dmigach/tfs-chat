@@ -9,9 +9,9 @@
 import Foundation
 
 class MessageDisplayModel {
-    enum MessageType {
-        case incoming
-        case outgoing
+    @objc enum MessageType: Int {
+        case incoming = 0
+        case outgoing = 1
     }
     
     let text: String
