@@ -7,29 +7,31 @@
 //
 
 class RootAssembly {
-    static let profileAssembly = ProfileAssembly(coreDataStack: coreDataStack)
+    lazy var profileAssembly = ProfileAssembly(coreDataStack: coreDataStack)
 
-    static let chatsListAssembly: ChatsListModuleAssembly = {
-        let chatsListAssembler = ChatsListModuleAssembly(communicationService: RootAssembly.communicationServiceAssembly,
-                                                         coreDataStack: coreDataStack)
+    lazy var chatsListAssembly: ChatsListModuleAssembly = {
+        let chatsListAssembler = ChatsListModuleAssembly(chatAssembler: self.chatAssembly,
+                                                         coreDataStack: self.coreDataStack,
+                                                         profileAssembler: self.profileAssembly,
+                                                         communicationService: self.communicationServiceAssembly)
         return chatsListAssembler
     }()
     
-    private static let communicationServiceAssembly: ICommunicationService = {
+    lazy var chatAssembly: ChatAssembly = {
+        let communicationAssembly = ChatAssembly(communicationService: self.communicationServiceAssembly,
+                                                 coreDataStack: self.coreDataStack)
+        return communicationAssembly
+    }()
+    
+    lazy var coreDataStack: ICoreDataStack = {
+       return CoreDataStack()
+    }()
+    
+    lazy var communicationServiceAssembly: ICommunicationService = {
         let communicator = MultipeerCommunicator(MessageConverter(encoder: MessageEncoder(),
                                                                   decoder: MessageDecoder()))
         let communicationService = CommunicationService(communicator: communicator)
         communicator.delegate = communicationService
         return communicationService
-    }()
-    
-    static let chatAssembly: ChatAssembly = {
-        let communicationAssembly = ChatAssembly(communicationService: RootAssembly.communicationServiceAssembly,
-                                                 coreDataStack: RootAssembly.coreDataStack)
-        return communicationAssembly
-    }()
-    
-    private static let coreDataStack: ICoreDataStack = {
-       return CoreDataStack()
     }()
 }

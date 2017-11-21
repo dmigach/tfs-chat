@@ -15,14 +15,20 @@ class ChatsListViewController: UIViewController, IChatsListModelDelegate {
 
     //MARK: - Properties
     private var model: IChatListModel!
+    private var profileAssembler: ProfileAssembly?
+    private var chatAssembler: ChatAssembly?
     
     private struct SegueIdentifiers {
         static let chat = "ShowChat"
         static let profile = "ShowProfile"
     }
 
-    func inject(model: IChatListModel) {
+    func inject(model: IChatListModel,
+                chatAssembler: ChatAssembly,
+                profileAssembler: ProfileAssembly) {
         self.model = model
+        self.chatAssembler = chatAssembler
+        self.profileAssembler = profileAssembler
     }
     
     //MARK: VC Life cycle
@@ -53,7 +59,10 @@ class ChatsListViewController: UIViewController, IChatsListModelDelegate {
     private func prepareForProfileSegue(to target: UIViewController) {
         guard let navigationVC = target as? UINavigationController,
                 let profileVC = navigationVC.topViewController as? ProfileViewController else { return }
-        RootAssembly.profileAssembly.injectDependencies(to: profileVC)
+        
+        if let profileAssembly = self.profileAssembler {
+            profileAssembly.injectDependencies(to: profileVC)
+        }
     }
     
     private func prepareForChatSegue(to target: UIViewController) {
@@ -66,8 +75,10 @@ class ChatsListViewController: UIViewController, IChatsListModelDelegate {
         }
         let choosedChat = model.getChat(at: selectedIndexPath)
         if let id = choosedChat.chatID {
-            RootAssembly.chatAssembly.assembly(chatViewController: chatViewController,
-                                               chatID: id)
+            if let chatAssembly = self.chatAssembler {
+                chatAssembly.assembly(chatViewController: chatViewController,
+                                      chatID: id)
+            }
         }
         tableView.deselectRow(at: selectedIndexPath, animated: true)
     }

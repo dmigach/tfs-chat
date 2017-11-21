@@ -7,3 +7,13 @@
 //
 
 import Foundation
+
+struct RequestsFactory {
+    
+    struct PixabayRequests {
+        static func randomImages() -> RequestConfig<[ImageModel]> {
+            return RequestConfig<[ImageModel]>(request: PixabayRandomImagesRequest(),
+                                               parser: PixabayImageParser())
+        }
+    }
+}

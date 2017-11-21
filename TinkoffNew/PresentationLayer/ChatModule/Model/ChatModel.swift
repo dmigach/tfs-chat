@@ -91,10 +91,13 @@ class ChatModel: IChatModel {
     func getMessage(at indexPath: IndexPath) -> MessageDisplayModel {
         if let frc = dataProvider?.fetchedResultsController {
             let message = frc.object(at: indexPath)
-            let messageDisplayModel = MessageDisplayModel(withText: message.text!,
-                                                          date: (message.date?.getDateForMessage())!,
-                                                          type: MessageDisplayModel.MessageType(rawValue: Int(message.messageType))!)
-            return messageDisplayModel
+            if let text = message.text,
+                let date = message.date?.getDateForMessage() {
+                let messageDisplayModel = MessageDisplayModel(withText: text,
+                                                              date: date,
+                                                              type: MessageDisplayModel.MessageType(rawValue: Int(message.messageType))!)
+                return messageDisplayModel
+            }
         }
         return MessageDisplayModel(withText: "Not found",
                                    date: Date().getDateForMessage(),

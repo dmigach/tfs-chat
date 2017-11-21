@@ -14,6 +14,13 @@ class ImageCollectionAssembly {
     func assembleImageCollectionModule() -> UINavigationController {
         let imageCollectionStoryboard = UIStoryboard(name: "ImageCollection", bundle: nil)
         let imageCollectionNavigationController = imageCollectionStoryboard.instantiateInitialViewController() as! UINavigationController
+        if let imageCollectionViewController = imageCollectionNavigationController.topViewController as? ImageCollectionViewController {
+            imageCollectionViewController.injectDependencies(model: getImageCollectionModel())
+        }
         return imageCollectionNavigationController
+    }
+    
+    func getImageCollectionModel() -> ImageCollectionModel {
+        return ImageCollectionModel(imageService: ImageLoadingService(requestSender: RequestSender()))
     }
 }

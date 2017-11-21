@@ -8,8 +8,6 @@
 
 import UIKit
 
-//TODO obfuscate
-
 class ImageCollectionCell: UICollectionViewCell {
     @IBOutlet weak var imageInCell: UIImageView!
 

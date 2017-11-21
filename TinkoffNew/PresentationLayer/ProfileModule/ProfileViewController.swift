@@ -21,7 +21,7 @@ class ProfileViewController: UIViewController {
 
     //MARK: - Actions
     @IBAction func saveWithCoreData(_ sender: UIButton) {
-        saveProfile(saveingKind: .CoreData)
+        saveProfile(savingKind: .CoreData)
     }
     
     @IBAction private func selectPhoto(_ sender: UIButton) {
@@ -44,12 +44,14 @@ class ProfileViewController: UIViewController {
             coreDataSaveButton.isEnabled = model.profileChanged
         }
     }
+    var imageCollectonAssembler: ImageCollectionAssembly?
+
 
     //MARK: - Static
     static let cornerRadiusForProfilePicture: CGFloat = 50
 
     
-    // MARK: - View life cycle
+    //MARK: - View life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -57,6 +59,8 @@ class ProfileViewController: UIViewController {
         loadUserProfile()
         setupPhotoImageView()
         setupAddPhotoButton()
+        
+        configureButtonStates()
 
         nameTextField.delegate = self
         infoTextField.delegate = self
@@ -80,6 +84,11 @@ class ProfileViewController: UIViewController {
     }
     
     // MARK: - UI
+    func configureButtonStates() {
+        coreDataSaveButton.setTitleColor(UIColor.lightGray, for: .disabled)
+
+    }
+    
     func setupPhotoImageView() {
         profilePhoto.layer.cornerRadius = ProfileViewController.cornerRadiusForProfilePicture
         profilePhoto.layer.masksToBounds = true
@@ -116,19 +125,18 @@ class ProfileViewController: UIViewController {
         })
     }
     
-    func saveProfile(saveingKind: ProfileSaveKind) {
+    func saveProfile(savingKind: ProfileSaveKind) {
         if let changed = model?.profileChanged, changed {
             activityIndicator.startAnimating()
-            coreDataSaveButton.isEnabled = false
-            model?.saveProfile(saveKind: saveingKind,
+            model?.saveProfile(saveKind: savingKind,
                                completionHandler: { [weak self] (success) in
                 if let strongSelf = self {
                     strongSelf.activityIndicator.stopAnimating()
-                    strongSelf.coreDataSaveButton.isEnabled = true
+                    strongSelf.coreDataSaveButton.isEnabled = false
                     if success {
                         strongSelf.showAlertForSuccessfulSave()
                     } else {
-                        strongSelf.showAlertForFailedSave(with: saveingKind)
+                        strongSelf.showAlertForFailedSave(with: savingKind)
                     }
                 }
             })
@@ -157,7 +165,7 @@ class ProfileViewController: UIViewController {
                                                 handler: nil))
         alertController.addAction(UIAlertAction(title: "Повторить",
                                                 style: .default) { _ in
-            self.saveProfile(saveingKind: saveKind)
+            self.saveProfile(savingKind: saveKind)
         })
         present(alertController, animated: true, completion: nil)
     }
@@ -184,13 +192,13 @@ class ProfileViewController: UIViewController {
     }
 }
 
-// MARK: - UIImagePickerControllerDelegate
+//MARK: - UIImagePickerControllerDelegate
 extension ProfileViewController: UIImagePickerControllerDelegate {
     private func showPhotoSetup() {
         let alertController = UIAlertController(title: "Выбрать изображение профиля",
                                                 message: nil,
                                                 preferredStyle: .actionSheet)
-        if UIImagePickerController.isSourceTypeAvailable(.camera){
+        if UIImagePickerController.isSourceTypeAvailable(.camera) {
             let cameraAction = UIAlertAction(title: "Сделать фото",
                                              style: .default) { _ in
                 self.showImagePicker(for: .camera)
@@ -201,10 +209,28 @@ extension ProfileViewController: UIImagePickerControllerDelegate {
                                                style: .default) { _ in
             self.showImagePicker(for: .photoLibrary)
         }
+        
+        let imageCollectionAction = UIAlertAction(title: "Загрузить из интернета",
+                                               style: .default) { _ in
+                                                self.showImageCollection()
+        }
+        
         let cancelAction = UIAlertAction(title: "Отменить", style: .cancel)
-        alertController.addAction(photoLibraryAction)
+        
         alertController.addAction(cancelAction)
+        alertController.addAction(photoLibraryAction)
+        alertController.addAction(imageCollectionAction)
+
         present(alertController, animated: true, completion: nil)
+    }
+    
+    private func showImageCollection() {
+        let imageCollectionNavigationController = ImageCollectionAssembly().assembleImageCollectionModule()
+        let imageCollectionController = imageCollectionNavigationController.topViewController as? ImageCollectionViewController
+            
+        imageCollectionController?.delegate = self
+        
+        present(imageCollectionNavigationController, animated: true, completion: nil)
     }
     
     private func showImagePicker(for sourceType: UIImagePickerControllerSourceType) {
@@ -226,14 +252,14 @@ extension ProfileViewController: UIImagePickerControllerDelegate {
     }
 }
 
-// MARK: - UINavigationControllerDelegate
+//MARK: - UINavigationControllerDelegate
 extension ProfileViewController: UINavigationControllerDelegate {
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         dismiss(animated: true, completion: nil)
     }
 }
 
-// MARK: - UITextFieldDelegate
+//MARK: - UITextFieldDelegate
 extension ProfileViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         view.endEditing(true)
@@ -251,5 +277,13 @@ extension ProfileViewController: UITextFieldDelegate {
         } else if (textField == infoTextField) {
             currentProfile.info = textField.text!
         }
+    }
+}
+
+//MARK: - ImageCollectionViewControllerDelegate
+extension ProfileViewController: ImageCollectionViewControllerDelegate {
+    func imageCollectionViewControllerDidFinishPickingImage(image: UIImage) {
+        profilePhoto.image = image
+        currentProfile.profilePhoto = image
     }
 }
