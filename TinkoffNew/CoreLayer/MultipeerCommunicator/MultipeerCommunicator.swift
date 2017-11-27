@@ -150,10 +150,14 @@ extension MultipeerCommunicator: MCNearbyServiceBrowserDelegate {
         peersInfo[peerID] = info
         let session = getSessionForUser(with: peerID) ?? createNewSession(with: peerID)
         
-        browser.invitePeer(peerID,
-                           to: session,
-                           withContext: nil,
-                           timeout: ConnectivityConstants.timeout)
+        if session.connectedPeers.contains(peerID) == false {
+            browser.invitePeer(peerID,
+                               to: session,
+                               withContext: nil,
+                               timeout: ConnectivityConstants.timeout)
+        }
+        delegate?.foundUser(userID: peerID.displayName,
+                            userName: info?[ConnectivityConstants.discoveryInfoUserNameKey])
     }
     
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {

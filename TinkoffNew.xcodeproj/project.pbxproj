@@ -29,6 +29,8 @@
 		6454EE1E1FB1A7ED00A3CF6B /* ProfileStorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6454EE1D1FB1A7ED00A3CF6B /* ProfileStorageManager.swift */; };
 		6454EE201FB1A99100A3CF6B /* AppUser+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6454EE1F1FB1A99100A3CF6B /* AppUser+Extension.swift */; };
 		6454EE221FB1A99800A3CF6B /* User+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6454EE211FB1A99800A3CF6B /* User+Extension.swift */; };
+		64579D561FCBD5D60036E980 /* TinkoffFanWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64579D551FCBD5D60036E980 /* TinkoffFanWindow.swift */; };
+		64579D581FCBD80F0036E980 /* tcs_logo32.png in Resources */ = {isa = PBXBuildFile; fileRef = 64579D571FCBD80E0036E980 /* tcs_logo32.png */; };
 		646BA4511FAAF5FD00638BE2 /* ChatsList.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 646BA4501FAAF5FD00638BE2 /* ChatsList.storyboard */; };
 		6478432F1FC45F7F00C795EB /* ImageCollectionAssembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6478432E1FC45F7F00C795EB /* ImageCollectionAssembly.swift */; };
 		648B46FF1FADF8B30095AA9B /* Profile.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 648B46FE1FADF8B30095AA9B /* Profile.storyboard */; };
@@ -93,6 +95,8 @@
 		6454EE1D1FB1A7ED00A3CF6B /* ProfileStorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStorageManager.swift; sourceTree = "<group>"; };
 		6454EE1F1FB1A99100A3CF6B /* AppUser+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppUser+Extension.swift"; sourceTree = "<group>"; };
 		6454EE211FB1A99800A3CF6B /* User+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "User+Extension.swift"; sourceTree = "<group>"; };
+		64579D551FCBD5D60036E980 /* TinkoffFanWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TinkoffFanWindow.swift; sourceTree = "<group>"; };
+		64579D571FCBD80E0036E980 /* tcs_logo32.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tcs_logo32.png; sourceTree = "<group>"; };
 		646BA4501FAAF5FD00638BE2 /* ChatsList.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = ChatsList.storyboard; sourceTree = "<group>"; };
 		6478432E1FC45F7F00C795EB /* ImageCollectionAssembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCollectionAssembly.swift; sourceTree = "<group>"; };
 		648B46FE1FADF8B30095AA9B /* Profile.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Profile.storyboard; sourceTree = "<group>"; };
@@ -420,6 +424,8 @@
 				64AB90E41FAB15E90094265B /* RootAssembly.swift */,
 				64FBC6501FAA4DCF00D4A259 /* Info.plist */,
 				64FBC6561FAA4DE700D4A259 /* SupportingFiles */,
+				64579D551FCBD5D60036E980 /* TinkoffFanWindow.swift */,
+				64579D571FCBD80E0036E980 /* tcs_logo32.png */,
 			);
 			path = TinkoffNew;
 			sourceTree = "<group>";
@@ -523,6 +529,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				64579D581FCBD80F0036E980 /* tcs_logo32.png in Resources */,
 				644A14BE1FC18DED005CF401 /* ImageCollection.storyboard in Resources */,
 				64FBC64F1FAA4DCF00D4A259 /* LaunchScreen.storyboard in Resources */,
 				64FBC64C1FAA4DCF00D4A259 /* Assets.xcassets in Resources */,
@@ -594,6 +601,7 @@
 				64AC5BDC1FAC43C300030ADF /* CommunicatonService.swift in Sources */,
 				64AC5BED1FAC4C9D00030ADF /* ChatCell.swift in Sources */,
 				6423ADEE1FB09FFA008B437E /* ChatModuleAssembly.swift in Sources */,
+				64579D561FCBD5D60036E980 /* TinkoffFanWindow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

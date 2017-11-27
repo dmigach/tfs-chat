@@ -12,7 +12,16 @@ import CoreData
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-    var window: UIWindow?
+    var customWindow: TinkoffFanWindow?
+    var window: UIWindow? {
+        get {
+            customWindow = customWindow ?? TinkoffFanWindow(frame: UIScreen.main.bounds)
+            return customWindow
+        }
+        set {
+            
+        }
+    }
     
     private let rootAssembly = RootAssembly()
 

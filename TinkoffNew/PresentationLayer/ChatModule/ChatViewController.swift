@@ -14,20 +14,20 @@ class ChatViewController: UIViewController {
     @IBOutlet internal weak var tableView: UITableView!
     @IBOutlet private weak var sendButton: UIButton! {
         didSet {
-            sendButton.isEnabled = true
+            changeSendButtonState(flag: true)
         }
     }
     @IBOutlet private weak var messageTextView: UITextView!
     @IBOutlet private weak var bottomConstraint: NSLayoutConstraint!
 
     
-    //MARK: - Action
+    //MARK: - Actions
     @IBAction private func sendButtonAction(_ sender: UIButton) {
         messageTextView.text = messageTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
         model.send(message: messageTextView.text) {
             DispatchQueue.main.async {
                 self.messageTextView.text = ""
-                self.sendButton.isEnabled = false
+                self.changeSendButtonState(flag: false)
             }
         }
     }
@@ -37,10 +37,12 @@ class ChatViewController: UIViewController {
     }
     
     //MARK: - Properties
+    var titleLabel: UILabel?
     private var model: IChatModel!
     var userIsOnline: Bool = true {
         didSet {
             changeSendButtonState(flag: userIsOnline)
+            changeTitleState(flag: userIsOnline)
         }
     }
 
@@ -50,8 +52,8 @@ class ChatViewController: UIViewController {
         configureTableView()
         setupMessageTextView()
         self.model.delegate = self
-        sendButton.isEnabled = false
         messageTextView.delegate = self
+        changeSendButtonState(flag: false)
         registerForKeyboardNotifications()
         configureTitle(with: model.userName)
         self.userIsOnline = model.chatOnline
@@ -93,13 +95,55 @@ class ChatViewController: UIViewController {
             let conditionToEnableButton = self.userIsOnline && self.messageTextView != nil && self.messageTextView.text != ""
             let currentButtonStateDiffers = self.sendButton.isEnabled != conditionToEnableButton
             if currentButtonStateDiffers {
-                self.sendButton.isEnabled = flag
+                UIView.transition(with: self.sendButton,
+                                  duration: 0.5,
+                                  options: UIViewAnimationOptions.beginFromCurrentState,
+                                  animations: {
+                                    let animationScale = CAKeyframeAnimation(keyPath: "transform.scale")
+                                    let normalScale = 1.0
+                                    let enlargedScale = 1.15
+                                    animationScale.values = [normalScale, enlargedScale, normalScale]
+                                    self.sendButton.layer.add(animationScale, forKey: "scaling")
+                                    self.sendButton.isEnabled = flag
+                },
+                                  completion: nil)
+            }
+        }
+    }
+    
+    private func changeTitleState(flag: Bool) {
+        var color: UIColor?
+        if flag {
+            color = UIColor.init(red: 85/255, green: 177/255, blue: 114/255, alpha: 1)
+        } else {
+            color = UIColor.black
+        }
+        
+        DispatchQueue.main.async {
+            if let title = self.titleLabel {
+                UIView.transition(with: title,
+                                  duration: 1,
+                                  options: .beginFromCurrentState,
+                                  animations: {
+                                    let animationScale = CAKeyframeAnimation(keyPath: "transform.scale")
+                                    let normalScale = 1.0
+                                    let enlargedScale = 1.1
+                                    animationScale.values = [normalScale, enlargedScale, normalScale]
+                                    self.navigationItem.titleView?.layer.add(animationScale, forKey: "scaling")
+                                    title.textColor = color
+                },
+                                  completion: nil)
             }
         }
     }
 
     private func configureTitle(with userName: String) {
-        navigationItem.title = userName
+        let titleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 30))
+        titleLabel.textColor = userIsOnline ? UIColor.init(red: 85/255, green: 177/255, blue: 114/255, alpha: 1) : UIColor.black
+        titleLabel.text = userName
+        titleLabel.textAlignment = .center
+        navigationItem.titleView = titleLabel
+        self.titleLabel = titleLabel
     }
     
     private func configureTableView() {
@@ -147,7 +191,7 @@ class ChatViewController: UIViewController {
 // MARK: - IChatModelDelegate
 extension ChatViewController: IChatModelDelegate {
     func userChangedStatusTo(online: Bool) {
-        self.userIsOnline = false
+        self.userIsOnline = online
     }
 }
 

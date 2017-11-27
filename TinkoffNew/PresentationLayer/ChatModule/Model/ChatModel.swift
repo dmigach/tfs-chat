@@ -73,7 +73,6 @@ class ChatModel: IChatModel {
                 print("Error sending message: \(error)")
             } else if success {
                 completionHandler?()
-                print("send success")
             } else {
                 print("Error sending message: unknown error")
             }
@@ -116,7 +115,7 @@ extension ChatModel: ICommunicationServiceDelegate {
         }
     }
     
-    func didFindUser(userID: String, userName: String?) {
+    func foundUser(userID: String, userName: String?) {
         self.chatOnline = true
         self.chatStorageManager.set(onlineStatus: true,
                                     forUserWithID: userID)
