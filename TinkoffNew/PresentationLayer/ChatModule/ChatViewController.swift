@@ -53,15 +53,17 @@ class ChatViewController: UIViewController {
         setupMessageTextView()
         self.model.delegate = self
         messageTextView.delegate = self
-        changeSendButtonState(flag: false)
+        sendButton.isEnabled = false
         registerForKeyboardNotifications()
-        configureTitle(with: model.userName)
         self.userIsOnline = model.chatOnline
+        configureTitle(with: model.userName)
+        self.sendButton.backgroundColor = UIColor.lightGray
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         model.markChatAsRead()
+        changeTitleState(flag: model.chatOnline)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -95,41 +97,38 @@ class ChatViewController: UIViewController {
             let conditionToEnableButton = self.userIsOnline && self.messageTextView != nil && self.messageTextView.text != ""
             let currentButtonStateDiffers = self.sendButton.isEnabled != conditionToEnableButton
             if currentButtonStateDiffers {
-                UIView.transition(with: self.sendButton,
-                                  duration: 0.5,
-                                  options: UIViewAnimationOptions.beginFromCurrentState,
-                                  animations: {
-                                    let animationScale = CAKeyframeAnimation(keyPath: "transform.scale")
-                                    let normalScale = 1.0
-                                    let enlargedScale = 1.15
-                                    animationScale.values = [normalScale, enlargedScale, normalScale]
-                                    self.sendButton.layer.add(animationScale, forKey: "scaling")
-                                    self.sendButton.isEnabled = flag
-                },
-                                  completion: nil)
+                let scaleAnimation = CAKeyframeAnimation(keyPath: "transform.scale")
+                let normalScale = 1.0
+                let enlargedScale = 1.15
+                scaleAnimation.values = [normalScale, enlargedScale, normalScale]
+                
+                let colorAnimation = CABasicAnimation(keyPath: "backgroundColor")
+                self.sendButton.backgroundColor = conditionToEnableButton ? UIColor.init(red: 36/255,
+                                                                                         green: 113/255,
+                                                                                         blue: 250/255,
+                                                                                         alpha: 1) : UIColor.lightGray
+                
+                let animationGroup = CAAnimationGroup()
+                animationGroup.duration = 0.5
+                animationGroup.animations = [scaleAnimation, colorAnimation]
+                self.sendButton.layer.add(animationGroup, forKey: "animationGroup")
+
+                self.sendButton.isEnabled = flag
             }
         }
     }
     
     private func changeTitleState(flag: Bool) {
-        var color: UIColor?
-        if flag {
-            color = UIColor.init(red: 85/255, green: 177/255, blue: 114/255, alpha: 1)
-        } else {
-            color = UIColor.black
-        }
+        let color = flag ? UIColor.init(red: 85/255, green: 177/255, blue: 114/255, alpha: 1) : UIColor.black
+        let scale: CGFloat = flag ? 1.1 : 1.0
         
         DispatchQueue.main.async {
             if let title = self.titleLabel {
                 UIView.transition(with: title,
                                   duration: 1,
-                                  options: .beginFromCurrentState,
+                                  options: .transitionCrossDissolve,
                                   animations: {
-                                    let animationScale = CAKeyframeAnimation(keyPath: "transform.scale")
-                                    let normalScale = 1.0
-                                    let enlargedScale = 1.1
-                                    animationScale.values = [normalScale, enlargedScale, normalScale]
-                                    self.navigationItem.titleView?.layer.add(animationScale, forKey: "scaling")
+                                    title.transform = CGAffineTransform(scaleX: scale, y: scale)
                                     title.textColor = color
                 },
                                   completion: nil)
@@ -139,7 +138,6 @@ class ChatViewController: UIViewController {
 
     private func configureTitle(with userName: String) {
         let titleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 30))
-        titleLabel.textColor = userIsOnline ? UIColor.init(red: 85/255, green: 177/255, blue: 114/255, alpha: 1) : UIColor.black
         titleLabel.text = userName
         titleLabel.textAlignment = .center
         navigationItem.titleView = titleLabel
